@@ -212,3 +212,26 @@ jobs:
           asset_path: ./PCB-Bottom.jpg
           asset_name: PCB-Bottom.${{ env.RELEASE_VERSION }}.jpg
           asset_content_type: image/jpeg
+      
+      - name: Install FreeCAD
+        id: install_freecad
+        run: sudo apt-get install -y freecad
+        
+      - name: Dowload STP to STL
+        id: download_stp_to_stl
+        run: wget https://raw.githubusercontent.com/thebentern/STP-STEP-to-STL-Python-Converter/main/STP-to-STL.py
+        
+      - name: Run STP to STL 
+        id: run_stp_to_stl
+        run: python3 ./STP-to-STL.py
+
+      - name: Upload Release STL
+        id: upload-release-stl
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing its ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./PCB-Model.stl
+          asset_name: PCB-Model.${{ env.RELEASE_VERSION }}.stl
+          asset_content_type: application/octet-stream
